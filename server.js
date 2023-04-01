@@ -6,6 +6,7 @@ const PORT=process.env.PORT||5000
 require('./Helper/connect_mongodb.js')
 const AuthRoute=require('./Routes/Auth.route.js')
 const { authorize } = require('./Middlewares/auth.middleware.js')
+require('./Helper/connect_redis.js')
 
 const app=express()
 app.use(express.json())

@@ -2,6 +2,7 @@ const UserModel = require("../Models/User.model.js");
 const createError = require("http-errors");
 const { AuthRegisterSchema } = require("../Helper/validation_schema.js");
 const { createAccessToken, createRefreshToken, verifyRefreshToken } = require("../Helper/jwt_generator.js");
+const client = require("../Helper/connect_redis.js");
 
 async function register(req, res, next) {
   try {
@@ -65,9 +66,26 @@ async function refreshToken(req,res,next){
   }
 }
 
+async function logout(req,res,next){
+  try {
+    const {refreshToken}=req.body
+    if(!refreshToken) throw createError.BadRequest()
+
+    const userId=await verifyRefreshToken(refreshToken)
+    const result= await client.DEL(userId)
+    if(!result){
+        throw createError.InternalServerError()
+     }
+    return res.sendStatus(204)
+
+  } catch (error) {
+    next(error)
+  }
+}
 
 module.exports = {
   register,
   login,
-  refreshToken
+  refreshToken,
+  logout
 };
